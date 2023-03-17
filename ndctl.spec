@@ -37,7 +37,11 @@ BuildRequires:	keyutils-devel
 BuildRequires:	keyutils-libs-devel
 %endif
 BuildRequires:	systemd-rpm-macros
+%if (0%{?suse_version} >= 1500)
+BuildRequires:	libiniparser-devel
+%else
 BuildRequires:	iniparser-devel
+%endif
 BuildRequires:	meson
 
 %description
