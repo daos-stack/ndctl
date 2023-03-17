@@ -41,5 +41,5 @@
 //@Library(value="pipeline-lib@your_branch") _
 
 /* groovylint-disable-next-line CompileStatic */
-packageBuildingPipelineDAOSTest(['distros': ['centos7', 'el8', 'leap15', 'ubuntu20.04'],
+packageBuildingPipelineDAOSTest(['distros': ['el8', 'leap15'],
                                 'test-tag': 'pr'])
