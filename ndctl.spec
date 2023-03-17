@@ -4,7 +4,7 @@ Release:	1%{?dist}
 Summary:	Manage "libnvdimm" subsystem devices (Non-volatile Memory)
 License:	GPLv2
 Url:		https://github.com/pmem/ndctl
-Source0:	https://github.com/pmem/%{name}/archive/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:	https://github.com/pmem/%{name}/archive/refs/tags/v%{version}.tar.gz
 
 Requires:	LNAME%{?_isa} = %{version}-%{release}
 Requires:	DAX_LNAME%{?_isa} = %{version}-%{release}
