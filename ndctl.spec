@@ -153,7 +153,7 @@ make check
 
 
 %changelog
-* Mon Mar 2023 Tom Nabarro <tom.nabarro@intel.com> - 76.1-1
+* Mon Mar 20 2023 Tom Nabarro <tom.nabarro@intel.com> - 76.1-1
 - Bump version to v76.1
 
 * Tue Jun 14 2022 Jeff Moyer <jmoyer@redhat.com> - 71.1-4.el8
