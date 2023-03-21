@@ -57,6 +57,15 @@ Requires:	ndctl-libs%{?_isa} = %{version}-%{release}
 The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}.
 
+%package -n ndctl-libs
+Summary:	Management library for "libnvdimm" subsystem devices (Non-volatile Memory)
+License:	LGPLv2
+Group:		System Environment/Libraries
+Requires:	daxctl-libs%{?_isa} = %{version}-%{release}
+
+%description -n ndctl-libs
+Libraries for %{name}.
+
 %package -n daxctl
 Summary:	Manage Device-DAX instances
 License:	GPLv2
@@ -80,17 +89,6 @@ The %{name}-devel package contains libraries and header files for
 developing applications that use %{name}, a library for enumerating
 "Device DAX" devices.  Device DAX is a facility for establishing DAX
 mappings of performance / feature-differentiated memory.
-
-
-%package -n ndctl-libs
-Summary:	Management library for "libnvdimm" subsystem devices (Non-volatile Memory)
-License:	LGPLv2
-Group:		System Environment/Libraries
-Requires:	daxctl-libs%{?_isa} = %{version}-%{release}
-
-
-%description -n ndctl-libs
-Libraries for %{name}.
 
 %package -n daxctl-libs
 Summary:	Management library for "Device DAX" devices
@@ -119,6 +117,13 @@ Requires:	cxl-libs%{?_isa} = %{version}-%{release}
 %description -n cxl-devel
 This package contains libraries and header files for developing applications
 that use libcxl, a library for enumerating and communicating with CXL devices.
+
+%package -n cxl-libs
+Summary:	Management library for CXL devices
+License:	LGPLv2
+
+%description -n cxl-libs
+libcxl is a library for enumerating and communicating with CXL devices.
 
 
 %prep
@@ -179,6 +184,17 @@ fi
 %config(noreplace) %{_sysconfdir}/ndctl.conf.d/monitor.conf
 %config(noreplace) %{_sysconfdir}/ndctl.conf.d/ndctl.conf
 
+%files -n ndctl-devel
+%license LICENSES/preferred/LGPL-2.1
+%{_includedir}/ndctl/
+%{_libdir}/libndctl.so
+%{_libdir}/pkgconfig/libndctl.pc
+
+%files -n ndctl-libs
+%doc README.md
+%license LICENSES/preferred/LGPL-2.1 LICENSES/other/MIT LICENSES/other/CC0-1.0
+%{_libdir}/libndctl.so.*
+
 %files -n daxctl
 %license LICENSES/preferred/GPL-2.0 LICENSES/other/MIT LICENSES/other/CC0-1.0
 %{_bindir}/daxctl
@@ -190,39 +206,23 @@ fi
 %dir %{_sysconfdir}/daxctl.conf.d/
 %config(noreplace) %{_sysconfdir}/daxctl.conf.d/daxctl.example.conf
 
-%files -n cxl-cli
-%license LICENSES/preferred/GPL-2.0 LICENSES/other/MIT LICENSES/other/CC0-1.0
-%{_bindir}/cxl
-%{_mandir}/man1/cxl*
-%{bashcompdir}/cxl
-%{_unitdir}/cxl-monitor.service
-
-%files -n ndctl-libs
-%doc README.md
-%license LICENSES/preferred/LGPL-2.1 LICENSES/other/MIT LICENSES/other/CC0-1.0
-%{_libdir}/libndctl.so.*
+%files -n daxctl-devel
+%license LICENSES/preferred/LGPL-2.1
+%{_includedir}/daxctl/
+%{_libdir}/libdaxctl.so
+%{_libdir}/pkgconfig/libdaxctl.pc
 
 %files -n daxctl-libs
 %doc README.md
 %license LICENSES/preferred/LGPL-2.1 LICENSES/other/MIT LICENSES/other/CC0-1.0
 %{_libdir}/libdaxctl.so.*
 
-%files -n cxl-libs
-%doc README.md
-%license LICENSES/preferred/LGPL-2.1 LICENSES/other/MIT LICENSES/other/CC0-1.0
-%{_libdir}/libcxl.so.*
-
-%files -n ndctl-devel
-%license LICENSES/preferred/LGPL-2.1
-%{_includedir}/ndctl/
-%{_libdir}/libndctl.so
-%{_libdir}/pkgconfig/libndctl.pc
-
-%files -n daxctl-devel
-%license LICENSES/preferred/LGPL-2.1
-%{_includedir}/daxctl/
-%{_libdir}/libdaxctl.so
-%{_libdir}/pkgconfig/libdaxctl.pc
+%files -n cxl-cli
+%license LICENSES/preferred/GPL-2.0 LICENSES/other/MIT LICENSES/other/CC0-1.0
+%{_bindir}/cxl
+%{_mandir}/man1/cxl*
+%{bashcompdir}/cxl
+%{_unitdir}/cxl-monitor.service
 
 %files -n cxl-devel
 %license LICENSES/preferred/LGPL-2.1
@@ -231,6 +231,11 @@ fi
 %{_libdir}/pkgconfig/libcxl.pc
 %{_mandir}/man3/cxl*
 %{_mandir}/man3/libcxl.3*
+
+%files -n cxl-libs
+%doc README.md
+%license LICENSES/preferred/LGPL-2.1 LICENSES/other/MIT LICENSES/other/CC0-1.0
+%{_libdir}/libcxl.so.*
 
 
 %changelog
