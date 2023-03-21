@@ -10,7 +10,17 @@ Source0:	https://github.com/pmem/%{name}/archive/v%{version}.tar.gz#/%{name}-%{v
 Requires:	ndctl-libs%{?_isa} = %{version}-%{release}
 Requires:	daxctl-libs%{?_isa} = %{version}-%{release}
 BuildRequires:	autoconf
+%if 0%{?rhel} < 9
 BuildRequires:	asciidoc
+%define asciidoctor -Dasciidoctor=disabled
+%define libtracefs -Dlibtracefs=disabled
+%else
+BuildRequires:	rubygem-asciidoctor
+BuildRequires:	libtraceevent-devel
+BuildRequires:	libtracefs-devel
+%define asciidoctor -Dasciidoctor=enabled
+%define libtracefs -Dlibtracefs=enabled
+%endif
 BuildRequires:	xmlto
 BuildRequires:	automake
 BuildRequires:	libtool
@@ -20,8 +30,11 @@ BuildRequires:	pkgconfig(libudev)
 BuildRequires:	pkgconfig(uuid)
 BuildRequires:	pkgconfig(json-c)
 BuildRequires:	pkgconfig(bash-completion)
-BuildRequires:	systemd
+BuildRequires:	pkgconfig(systemd)
 BuildRequires:	keyutils-libs-devel
+BuildRequires:	systemd-rpm-macros
+BuildRequires:	iniparser-devel
+BuildRequires:	meson
 
 %description
 Utility library for managing the "libnvdimm" subsystem.  The "libnvdimm"
@@ -87,46 +100,73 @@ control API for these devices.
 
 
 %prep
-%autosetup -p1 ndctl-%{version}
+%setup -q ndctl-%{version}
 
 %build
-echo %{version} > version
-%configure --disable-static --disable-silent-rules --disable-asciidoctor
-make %{?_smp_mflags}
-
+%meson %{?asciidoctor} %{?libtracefs} -Dversion-tag=%{version}
+%meson_build
 %install
-%make_install
-find $RPM_BUILD_ROOT -name '*.la' -exec rm -f {} ';'
-
+%meson_install
 %check
-make check
+%meson_test
+%ldconfig_scriptlets -n ndctl-libs
 
-%post -n ndctl-libs -p /sbin/ldconfig
-
-%postun -n ndctl-libs -p /sbin/ldconfig
-
-%post -n daxctl-libs -p /sbin/ldconfig
-
-%postun -n daxctl-libs -p /sbin/ldconfig
+%ldconfig_scriptlets -n daxctl-libs
 
 %define bashcompdir %(pkg-config --variable=completionsdir bash-completion)
+
+%pre
+if [ -f %{_sysconfdir}/ndctl/monitor.conf ] ; then
+  if ! [ -f %{_sysconfdir}/ndctl.conf.d/monitor.conf ] ; then
+    cp -a %{_sysconfdir}/ndctl/monitor.conf /var/run/ndctl-monitor.conf-migration
+  fi
+fi
+
+%post
+if [ -f /var/run/ndctl-monitor.conf-migration ] ; then
+  config_found=false
+  while read line ; do
+    [ -n "$line" ] || continue
+    case "$line" in
+      \#*) continue ;;
+    esac
+    config_found=true
+    break
+  done < /var/run/ndctl-monitor.conf-migration
+  if $config_found ; then
+    echo "[monitor]" > %{_sysconfdir}/ndctl.conf.d/monitor.conf
+    cat /var/run/ndctl-monitor.conf-migration >> %{_sysconfdir}/ndctl.conf.d/monitor.conf
+  fi
+  rm /var/run/ndctl-monitor.conf-migration
+fi
 
 %files
 %license LICENSES/preferred/GPL-2.0 LICENSES/other/MIT LICENSES/other/CC0-1.0
 %{_bindir}/ndctl
 %{_mandir}/man1/ndctl*
-%{bashcompdir}/
+%{bashcompdir}/ndctl
 %{_unitdir}/ndctl-monitor.service
+
+%dir %{_sysconfdir}/ndctl
+%dir %{_sysconfdir}/ndctl/keys
 %{_sysconfdir}/ndctl/keys/keys.readme
+
 %{_sysconfdir}/modprobe.d/nvdimm-security.conf
 
-%config(noreplace) %{_sysconfdir}/ndctl/monitor.conf
+%dir %{_sysconfdir}/ndctl.conf.d
+%config(noreplace) %{_sysconfdir}/ndctl.conf.d/monitor.conf
+%config(noreplace) %{_sysconfdir}/ndctl.conf.d/ndctl.conf
 
 %files -n daxctl
 %license LICENSES/preferred/GPL-2.0 LICENSES/other/MIT LICENSES/other/CC0-1.0
 %{_bindir}/daxctl
 %{_mandir}/man1/daxctl*
-%{_datadir}/daxctl/daxctl.conf
+%{_datadir}/daxctl
+%{bashcompdir}/daxctl
+%{_unitdir}/daxdev-reconfigure@.service
+%config %{_udevrulesdir}/90-daxctl-device.rules
+%dir %{_sysconfdir}/daxctl.conf.d/
+%config(noreplace) %{_sysconfdir}/daxctl.conf.d/daxctl.example.conf
 
 %files -n ndctl-libs
 %doc README.md
