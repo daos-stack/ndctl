@@ -91,7 +91,6 @@ control API for these devices.
 
 %build
 echo %{version} > version
-./autogen.sh
 %configure --disable-static --disable-silent-rules --disable-asciidoctor
 make %{?_smp_mflags}
 
