@@ -28,6 +28,9 @@ BuildRequires:	libtool
 BuildRequires:	pkgconfig
 BuildRequires:	pkgconfig(libkmod)
 BuildRequires:	pkgconfig(libudev)
+%if (0%{?suse_version} >= 1500)
+BuildRequires: udev
+%endif
 BuildRequires:	pkgconfig(uuid)
 BuildRequires:	pkgconfig(json-c)
 BuildRequires:	pkgconfig(bash-completion)
