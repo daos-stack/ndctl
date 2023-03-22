@@ -32,9 +32,17 @@ BuildRequires:	pkgconfig(uuid)
 BuildRequires:	pkgconfig(json-c)
 BuildRequires:	pkgconfig(bash-completion)
 BuildRequires:	pkgconfig(systemd)
+%if (0%{?suse_version} >= 1500)
+BuildRequires:	keyutils-devel
+%else
 BuildRequires:	keyutils-libs-devel
+%endif
 BuildRequires:	systemd-rpm-macros
+%if (0%{?suse_version} >= 1500)
+BuildRequires:	libiniparser-devel
+%else
 BuildRequires:	iniparser-devel
+%endif
 BuildRequires:	meson
 
 %description
